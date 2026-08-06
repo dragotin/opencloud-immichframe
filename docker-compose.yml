@@ -1,0 +1,82 @@
+
+name: immichframe-opencloud
+
+# Topology
+#   client ─▶ traefik :8080 ─▶ immichframe-opencloud  (web UI + API, one origin)
+#
+# The official ImmichFrame server refuses to boot without a reachable Immich, so
+# it cannot run as a headless web-UI container. Instead the official image is
+# used as an init container that exports its bundled web UI into a shared
+# volume, which immichframe-opencloud then serves via WEB_ROOT. Traefik is the
+# edge proxy (single entrypoint; add TLS/dashboard here later).
+
+volumes:
+  webui:
+
+services:
+  # Init container: copy the official ImmichFrame web UI into the shared volume, then exit.
+  webui:
+    image: ghcr.io/immichframe/immichframe:latest
+    user: "0:0" # write into the root-owned named volume
+    entrypoint: ["sh", "-c", "cp -r /app/wwwroot/. /web/ && echo 'ImmichFrame web UI exported to /web'"]
+    volumes:
+      - webui:/web
+    restart: "no"
+
+  # Our Go backend — serves the API from an OpenCloud space AND the web UI from the volume.
+  immichframe-opencloud:
+    build:
+      context: .
+    image: immichframe-opencloud:local
+    restart: unless-stopped
+    depends_on:
+      webui:
+        condition: service_completed_successfully
+    # Lets the container reach an OpenCloud running on the Docker host.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      OPENCLOUD_BASE_URL: ${OPENCLOUD_BASE_URL:?set OPENCLOUD_BASE_URL in .env}
+      OPENCLOUD_SPACE_ID: ${OPENCLOUD_SPACE_ID:-}
+      OPENCLOUD_SPACE_NAME: ${OPENCLOUD_SPACE_NAME:-}
+      OPENCLOUD_USERNAME: ${OPENCLOUD_USERNAME:-}
+      OPENCLOUD_APP_PASSWORD: ${OPENCLOUD_APP_PASSWORD:-}
+      OPENCLOUD_BEARER_TOKEN: ${OPENCLOUD_BEARER_TOKEN:-}
+      OPENCLOUD_INSECURE_TLS: ${OPENCLOUD_INSECURE_TLS:-false}
+      # Must match what the web UI sends. Empty = open (simplest to start).
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      WEB_ROOT: /web
+      # Slideshow / web-UI display settings (all optional; see .env.example).
+      FRAME_INTERVAL: ${FRAME_INTERVAL:-}
+      FRAME_TRANSITION_DURATION: ${FRAME_TRANSITION_DURATION:-}
+      FRAME_SHOW_CLOCK: ${FRAME_SHOW_CLOCK:-}
+      FRAME_CLOCK_FORMAT: ${FRAME_CLOCK_FORMAT:-}
+      FRAME_CLOCK_DATE_FORMAT: ${FRAME_CLOCK_DATE_FORMAT:-}
+      FRAME_SHOW_PROGRESS_BAR: ${FRAME_SHOW_PROGRESS_BAR:-}
+      FRAME_SHOW_PHOTO_DATE: ${FRAME_SHOW_PHOTO_DATE:-}
+      FRAME_PHOTO_DATE_FORMAT: ${FRAME_PHOTO_DATE_FORMAT:-}
+      FRAME_SHOW_IMAGE_LOCATION: ${FRAME_SHOW_IMAGE_LOCATION:-}
+      FRAME_IMAGE_LOCATION_FORMAT: ${FRAME_IMAGE_LOCATION_FORMAT:-}
+      FRAME_SHOW_IMAGE_DESC: ${FRAME_SHOW_IMAGE_DESC:-}
+      FRAME_SHOW_ALBUM_NAME: ${FRAME_SHOW_ALBUM_NAME:-}
+      FRAME_LANGUAGE: ${FRAME_LANGUAGE:-}
+    volumes:
+      - webui:/web:ro
+
+  # Edge proxy. Uses the file provider (no Docker socket needed) and forwards
+  # everything to the backend by service name on the compose network.
+  traefik:
+    image: traefik:v3.3
+    restart: unless-stopped
+    depends_on:
+      - immichframe-opencloud
+    command:
+      - --entryPoints.web.address=:8080
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      # - --api.dashboard=true
+      # - --log.level=DEBUG
+    ports:
+      - "${LISTEN_PORT:-8080}:8080"
+    volumes:
+      # :z relabels for SELinux hosts; harmless elsewhere.
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro,z

@@ -1,0 +1,16 @@
+
+# Traefik dynamic configuration (file provider).
+# Routes the whole site to the immichframe-opencloud backend, which serves both
+# the web UI (from the exported volume) and the /api endpoints.
+http:
+  routers:
+    immichframe:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - web
+      service: opencloud
+  services:
+    opencloud:
+      loadBalancer:
+        servers:
+          - url: "http://immichframe-opencloud:8080"
