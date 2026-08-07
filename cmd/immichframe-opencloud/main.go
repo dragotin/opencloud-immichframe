@@ -20,9 +20,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/immichFrame/immichframe-opencloud/internal/config"
 	"github.com/immichFrame/immichframe-opencloud/internal/frame"
 	"github.com/immichFrame/immichframe-opencloud/internal/opencloud"
+	"github.com/immichFrame/immichframe-opencloud/pkg/config/defaults"
+	"github.com/immichFrame/immichframe-opencloud/pkg/config/parser"
 )
 
 // version is overridable at build time: -ldflags "-X main.version=1.2.3".
@@ -36,19 +37,19 @@ func main() {
 
 func run() error {
 	insecure := flag.Bool("insecure", false,
-		"accept self-signed / invalid TLS certificates from the OpenCloud server (overrides OPENCLOUD_INSECURE_TLS)")
+		"accept self-signed / invalid TLS certificates from the OpenCloud server (overrides OC_INSECURE)")
 	flag.Parse()
 
-	cfg, err := config.Load()
-	if err != nil {
+	cfg := defaults.FullDefaultConfig()
+	if err := parser.ParseConfig(cfg); err != nil {
 		return err
 	}
 	// A set -insecure flag forces TLS verification off; otherwise keep the
-	// value derived from OPENCLOUD_INSECURE_TLS.
+	// value derived from OC_INSECURE.
 	if isFlagSet("insecure") {
-		cfg.InsecureTLS = *insecure
+		cfg.OpenCloud.Insecure = *insecure
 	}
-	if cfg.InsecureTLS {
+	if cfg.OpenCloud.Insecure {
 		log.Print("WARNING: TLS certificate verification is disabled")
 	}
 
@@ -59,26 +60,26 @@ func run() error {
 	defer cancel()
 
 	client, err := opencloud.New(initCtx, opencloud.Options{
-		BaseURL:     cfg.OpenCloudBaseURL,
-		SpaceID:     cfg.SpaceID,
-		SpaceName:   cfg.SpaceName,
-		Username:    cfg.Username,
-		AppPassword: cfg.AppPassword,
-		BearerToken: cfg.BearerToken,
-		InsecureTLS: cfg.InsecureTLS,
+		BaseURL:     cfg.OpenCloud.URL,
+		SpaceID:     cfg.OpenCloud.SpaceID,
+		SpaceName:   cfg.OpenCloud.SpaceName,
+		Username:    cfg.OpenCloud.Username,
+		AppPassword: cfg.OpenCloud.AppPassword,
+		BearerToken: cfg.OpenCloud.BearerToken,
+		InsecureTLS: cfg.OpenCloud.Insecure,
 	})
 	if err != nil {
 		return err
 	}
-	log.Printf("connected to OpenCloud %s, serving space %s", cfg.OpenCloudBaseURL, client.SpaceID())
+	log.Printf("connected to OpenCloud %s, serving space %s", cfg.OpenCloud.URL, client.SpaceID())
 
-	catalog := frame.NewCatalog(initCtx, client, cfg.CatalogRefresh)
+	catalog := frame.NewCatalog(initCtx, client, cfg.Frame.CatalogRefresh)
 	go catalog.Run(ctx)
 
-	srv := frame.NewServer(cfg.Client, cfg.AuthSecret, version, cfg.WebRoot, catalog, client)
+	srv := frame.NewServer(cfg.Client, cfg.Frame.AuthSecret, version, cfg.Frame.WebRoot, catalog, client)
 
 	httpServer := &http.Server{
-		Addr:              cfg.ListenAddr,
+		Addr:              cfg.HTTP.Addr,
 		Handler:           srv.Handler(),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
@@ -90,10 +91,10 @@ func run() error {
 		_ = httpServer.Shutdown(shutdownCtx)
 	}()
 
-	if cfg.WebRoot != "" {
-		log.Printf("serving web UI from %s", cfg.WebRoot)
+	if cfg.Frame.WebRoot != "" {
+		log.Printf("serving web UI from %s", cfg.Frame.WebRoot)
 	}
-	log.Printf("listening on %s (auth: %v)", cfg.ListenAddr, cfg.AuthSecret != "")
+	log.Printf("listening on %s (auth: %v)", cfg.HTTP.Addr, cfg.Frame.AuthSecret != "")
 	if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
