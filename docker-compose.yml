@@ -7,7 +7,7 @@ name: immichframe-opencloud
 # The official ImmichFrame server refuses to boot without a reachable Immich, so
 # it cannot run as a headless web-UI container. Instead the official image is
 # used as an init container that exports its bundled web UI into a shared
-# volume, which immichframe-opencloud then serves via WEB_ROOT. Traefik is the
+# volume, which immichframe-opencloud then serves via IMMICHFRAME_WEB_ROOT. Traefik is the
 # edge proxy (single entrypoint; add TLS/dashboard here later).
 
 volumes:
@@ -35,31 +35,15 @@ services:
     # Lets the container reach an OpenCloud running on the Docker host.
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # All service config comes from .env, passed verbatim (names match what the
+    # binary reads). Commented-out vars in .env are simply not set, so the
+    # binary's built-in defaults apply. This avoids forwarding empty strings,
+    # which would otherwise blank out defaults.
+    env_file:
+      - .env
     environment:
-      OPENCLOUD_BASE_URL: ${OPENCLOUD_BASE_URL:?set OPENCLOUD_BASE_URL in .env}
-      OPENCLOUD_SPACE_ID: ${OPENCLOUD_SPACE_ID:-}
-      OPENCLOUD_SPACE_NAME: ${OPENCLOUD_SPACE_NAME:-}
-      OPENCLOUD_USERNAME: ${OPENCLOUD_USERNAME:-}
-      OPENCLOUD_APP_PASSWORD: ${OPENCLOUD_APP_PASSWORD:-}
-      OPENCLOUD_BEARER_TOKEN: ${OPENCLOUD_BEARER_TOKEN:-}
-      OPENCLOUD_INSECURE_TLS: ${OPENCLOUD_INSECURE_TLS:-false}
-      # Must match what the web UI sends. Empty = open (simplest to start).
-      AUTH_SECRET: ${AUTH_SECRET:-}
-      WEB_ROOT: /web
-      # Slideshow / web-UI display settings (all optional; see .env.example).
-      FRAME_INTERVAL: ${FRAME_INTERVAL:-}
-      FRAME_TRANSITION_DURATION: ${FRAME_TRANSITION_DURATION:-}
-      FRAME_SHOW_CLOCK: ${FRAME_SHOW_CLOCK:-}
-      FRAME_CLOCK_FORMAT: ${FRAME_CLOCK_FORMAT:-}
-      FRAME_CLOCK_DATE_FORMAT: ${FRAME_CLOCK_DATE_FORMAT:-}
-      FRAME_SHOW_PROGRESS_BAR: ${FRAME_SHOW_PROGRESS_BAR:-}
-      FRAME_SHOW_PHOTO_DATE: ${FRAME_SHOW_PHOTO_DATE:-}
-      FRAME_PHOTO_DATE_FORMAT: ${FRAME_PHOTO_DATE_FORMAT:-}
-      FRAME_SHOW_IMAGE_LOCATION: ${FRAME_SHOW_IMAGE_LOCATION:-}
-      FRAME_IMAGE_LOCATION_FORMAT: ${FRAME_IMAGE_LOCATION_FORMAT:-}
-      FRAME_SHOW_IMAGE_DESC: ${FRAME_SHOW_IMAGE_DESC:-}
-      FRAME_SHOW_ALBUM_NAME: ${FRAME_SHOW_ALBUM_NAME:-}
-      FRAME_LANGUAGE: ${FRAME_LANGUAGE:-}
+      # Compose-controlled: the web UI lives in the shared volume at /web.
+      IMMICHFRAME_WEB_ROOT: /web
     volumes:
       - webui:/web:ro
 

@@ -2,8 +2,7 @@
 
 FROM golang:1.23-alpine AS build
 WORKDIR /src
-COPY go.mod ./
-# COPY go.sum ./   # (no third-party deps yet)
+COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 ARG VERSION=dev

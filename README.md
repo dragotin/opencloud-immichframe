@@ -36,7 +36,7 @@ returns that folder as the album (`albumName` = folder name, `assetCount` =
 images directly in it). Images at the space **root** fall back to the space
 itself (name + description) as their album. Hidden dot-folders (e.g. OpenCloud's
 internal `.space`) are skipped entirely — they appear neither as albums nor in
-the slideshow. The web UI shows the album name when `FRAME_SHOW_ALBUM_NAME` is
+the slideshow. The web UI shows the album name when `IMMICHFRAME_SHOW_ALBUM_NAME` is
 enabled (the default).
 
 ## Asset IDs
@@ -54,40 +54,40 @@ All configuration is via environment variables.
 
 | Variable | Required | Default | Notes |
 | --- | --- | --- | --- |
-| `OPENCLOUD_BASE_URL` | yes | – | e.g. `https://cloud.example.com` |
-| `OPENCLOUD_SPACE_ID` | one of id/name | – | Drive (space) id to serve. |
-| `OPENCLOUD_SPACE_NAME` | one of id/name | – | Resolved via `/graph/v1.0/me/drives`. |
-| `OPENCLOUD_USERNAME` | with app pw | – | For Basic auth (app token). |
-| `OPENCLOUD_APP_PASSWORD` | with username | – | An OpenCloud app password/token. |
-| `OPENCLOUD_BEARER_TOKEN` | alt to basic | – | Static bearer token; takes precedence. |
-| `OPENCLOUD_INSECURE_TLS` | no | `false` | Accept self-signed / invalid TLS certs (dev only). Also settable via the `-insecure` flag. |
+| `OC_URL` | yes | – | e.g. `https://cloud.example.com` |
+| `IMMICHFRAME_SPACE_ID` | one of id/name | – | Drive (space) id to serve. |
+| `IMMICHFRAME_SPACE_NAME` | one of id/name | – | Resolved via `/graph/v1.0/me/drives`. |
+| `IMMICHFRAME_USERNAME` | with app pw | – | For Basic auth (app token). |
+| `IMMICHFRAME_APP_PASSWORD` | with username | – | An OpenCloud app password/token. |
+| `IMMICHFRAME_BEARER_TOKEN` | alt to basic | – | Static bearer token; takes precedence. |
+| `OC_INSECURE` | no | `false` | Accept self-signed / invalid TLS certs (dev only). Also settable via the `-insecure` flag. |
 
 ### Frame API
 
 | Variable | Default | Notes |
 | --- | --- | --- |
-| `LISTEN_ADDR` | `:8080` | |
-| `AUTH_SECRET` | *(empty)* | If set, clients must send `Authorization: Bearer <secret>`. Empty = open. |
-| `CATALOG_REFRESH` | `5m` | How often to re-scan the space. |
-| `WEB_ROOT` | *(empty)* | Directory with the built ImmichFrame web UI to serve at `/`. Set this to make `:8080` a full drop-in (UI + API on one origin), which the desktop/web clients require. |
+| `IMMICHFRAME_HTTP_ADDR` | `:8080` | |
+| `IMMICHFRAME_AUTH_SECRET` | *(empty)* | If set, clients must send `Authorization: Bearer <secret>`. Empty = open. |
+| `IMMICHFRAME_CATALOG_REFRESH` | `5m` | How often to re-scan the space. |
+| `IMMICHFRAME_WEB_ROOT` | *(empty)* | Directory with the built ImmichFrame web UI to serve at `/`. Set this to make `:8080` a full drop-in (UI + API on one origin), which the desktop/web clients require. |
 
 ### Serving the web UI (for the desktop / webview clients)
 
 The ImmichFrame **desktop** app (and the web client) load a single URL that must
 serve the whole ImmichFrame web app at `/` *and* the API at `/api`. Point
-`WEB_ROOT` at a build of [`immichFrame.Web`](https://github.com/immichFrame/ImmichFrame):
+`IMMICHFRAME_WEB_ROOT` at a build of [`immichFrame.Web`](https://github.com/immichFrame/ImmichFrame):
 
 ```sh
 cd ImmichFrame/immichFrame.Web && npm install && npm run build   # produces build/
 # then start this service with:
-WEB_ROOT=/path/to/ImmichFrame/immichFrame.Web/build ...other env... \
+IMMICHFRAME_WEB_ROOT=/path/to/ImmichFrame/immichFrame.Web/build ...other env... \
   immichframe-opencloud
 ```
 
 Now `http://localhost:8080/` serves the UI and `http://localhost:8080/api/*` the
 API. Configure the desktop client by writing that URL into its settings file
 (`~/.config/immichFrame/Settings.txt` on Linux — plain text, just the URL).
-Static assets are served without auth; only `/api/*` honours `AUTH_SECRET`.
+Static assets are served without auth; only `/api/*` honours `IMMICHFRAME_AUTH_SECRET`.
 
 ### Client settings (surfaced via `/api/Config`)
 
@@ -96,22 +96,22 @@ to the built-in default.
 
 | Variable | Default | Notes |
 | --- | --- | --- |
-| `FRAME_INTERVAL` | `8` | Seconds each image is shown. |
-| `FRAME_TRANSITION_DURATION` | `1` | Crossfade seconds. |
-| `FRAME_SHOW_CLOCK` | `true` | |
-| `FRAME_CLOCK_FORMAT` | `HH:mm` | date-fns **time** tokens. |
-| `FRAME_CLOCK_DATE_FORMAT` | `eee, MMM d` | date-fns **date** tokens (date line above the clock). |
-| `FRAME_SHOW_PROGRESS_BAR` | `true` | Slideshow progress bar. |
-| `FRAME_SHOW_PHOTO_DATE` | `true` | |
-| `FRAME_PHOTO_DATE_FORMAT` | `2006-01-02` | **Go** layout (formatted server-side). |
-| `FRAME_SHOW_IMAGE_LOCATION` | `false` | No EXIF/GPS in OpenCloud yet. |
-| `FRAME_IMAGE_LOCATION_FORMAT` | `City,State,Country` | |
-| `FRAME_SHOW_IMAGE_DESC` | `false` | |
-| `FRAME_SHOW_ALBUM_NAME` | `true` | Album = the image's folder in the space. |
-| `FRAME_LANGUAGE` | `en` | |
+| `IMMICHFRAME_INTERVAL` | `8` | Seconds each image is shown. |
+| `IMMICHFRAME_TRANSITION_DURATION` | `1` | Crossfade seconds. |
+| `IMMICHFRAME_SHOW_CLOCK` | `true` | |
+| `IMMICHFRAME_CLOCK_FORMAT` | `HH:mm` | date-fns **time** tokens. |
+| `IMMICHFRAME_CLOCK_DATE_FORMAT` | `eee, MMM d` | date-fns **date** tokens (date line above the clock). |
+| `IMMICHFRAME_SHOW_PROGRESS_BAR` | `true` | Slideshow progress bar. |
+| `IMMICHFRAME_SHOW_PHOTO_DATE` | `true` | |
+| `IMMICHFRAME_PHOTO_DATE_FORMAT` | `2006-01-02` | **Go** layout (formatted server-side). |
+| `IMMICHFRAME_SHOW_IMAGE_LOCATION` | `false` | No EXIF/GPS in OpenCloud yet. |
+| `IMMICHFRAME_IMAGE_LOCATION_FORMAT` | `City,State,Country` | |
+| `IMMICHFRAME_SHOW_IMAGE_DESC` | `false` | |
+| `IMMICHFRAME_SHOW_ALBUM_NAME` | `true` | Album = the image's folder in the space. |
+| `IMMICHFRAME_LANGUAGE` | `en` | |
 
-> Two different date syntaxes: `FRAME_CLOCK_*` use **date-fns** tokens
-> (`eee, MMM d`) because the web UI formats the clock; `FRAME_PHOTO_DATE_FORMAT`
+> Two different date syntaxes: `IMMICHFRAME_CLOCK_*` use **date-fns** tokens
+> (`eee, MMM d`) because the web UI formats the clock; `IMMICHFRAME_PHOTO_DATE_FORMAT`
 > uses a **Go** layout (`2006-01-02`) because the backend formats the photo date.
 
 People/faces and tags are intentionally omitted — OpenCloud spaces have no such
@@ -124,11 +124,11 @@ container by the `environment:` block in `docker-compose.yml`; see
 ## Running
 
 ```sh
-export OPENCLOUD_BASE_URL=https://cloud.example.com
-export OPENCLOUD_SPACE_NAME="Photo Frame"
-export OPENCLOUD_USERNAME=frame
-export OPENCLOUD_APP_PASSWORD=xxxxxxxx
-export AUTH_SECRET=my-shared-secret
+export OC_URL=https://cloud.example.com
+export IMMICHFRAME_SPACE_NAME="Photo Frame"
+export IMMICHFRAME_USERNAME=frame
+export IMMICHFRAME_APP_PASSWORD=xxxxxxxx
+export IMMICHFRAME_AUTH_SECRET=my-shared-secret
 
 go run ./cmd/immichframe-opencloud
 ```
@@ -137,7 +137,7 @@ go run ./cmd/immichframe-opencloud
 
 | Flag | Notes |
 | --- | --- |
-| `-insecure` | Accept self-signed / invalid TLS certificates from the OpenCloud server. Overrides `OPENCLOUD_INSECURE_TLS`. Development only. |
+| `-insecure` | Accept self-signed / invalid TLS certificates from the OpenCloud server. Overrides `OC_INSECURE`. Development only. |
 
 ```sh
 go run ./cmd/immichframe-opencloud -insecure
@@ -148,11 +148,11 @@ go run ./cmd/immichframe-opencloud -insecure
 ```sh
 docker build -t immichframe-opencloud .
 docker run --rm -p 8080:8080 \
-  -e OPENCLOUD_BASE_URL=https://cloud.example.com \
-  -e OPENCLOUD_SPACE_NAME="Photo Frame" \
-  -e OPENCLOUD_USERNAME=frame \
-  -e OPENCLOUD_APP_PASSWORD=xxxxxxxx \
-  -e AUTH_SECRET=my-shared-secret \
+  -e OC_URL=https://cloud.example.com \
+  -e IMMICHFRAME_SPACE_NAME="Photo Frame" \
+  -e IMMICHFRAME_USERNAME=frame \
+  -e IMMICHFRAME_APP_PASSWORD=xxxxxxxx \
+  -e IMMICHFRAME_AUTH_SECRET=my-shared-secret \
   immichframe-opencloud
 ```
 
@@ -177,12 +177,12 @@ docker compose up -d --build
 ```
 
 Notes:
-- Set `OPENCLOUD_SPACE_NAME` (e.g. `Images`) rather than `OPENCLOUD_SPACE_ID` —
+- Set `IMMICHFRAME_SPACE_NAME` (e.g. `Images`) rather than `IMMICHFRAME_SPACE_ID` —
   space ids contain `$`, which Compose interpolates (double it as `$$` if you
   must use the id).
 - If OpenCloud runs on the Docker host, keep
-  `OPENCLOUD_BASE_URL=https://host.docker.internal:9200` (the compose file maps
-  `host.docker.internal`). For a self-signed dev cert, `OPENCLOUD_INSECURE_TLS=true`.
+  `OC_URL=https://host.docker.internal:9200` (the compose file maps
+  `host.docker.internal`). For a self-signed dev cert, `OC_INSECURE=true`.
 - Rootless Docker: point Traefik at your runtime socket (see the comment in the
   compose file).
 - The official image needs `ImmichServerUrl`/`ApiKey` set just to boot; the
@@ -190,9 +190,9 @@ Notes:
 
 ## Smoke test
 
-If the API runs **open** (`AUTH_SECRET` empty, as in the Docker default), drop
+If the API runs **open** (`IMMICHFRAME_AUTH_SECRET` empty, as in the Docker default), drop
 the `-H "Authorization…"` header from every command below. Otherwise set
-`SECRET` to your `AUTH_SECRET`.
+`SECRET` to your `IMMICHFRAME_AUTH_SECRET`.
 
 ```sh
 SECRET=my-shared-secret

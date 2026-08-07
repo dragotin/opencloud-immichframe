@@ -14,8 +14,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/immichFrame/immichframe-opencloud/internal/config"
 	"github.com/immichFrame/immichframe-opencloud/internal/opencloud"
+	"github.com/immichFrame/immichframe-opencloud/pkg/config"
 )
 
 // versionPath is served without authentication.
