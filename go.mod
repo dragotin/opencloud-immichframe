@@ -2,7 +2,10 @@ module github.com/immichFrame/opencloud-immichframe
 
 go 1.25.8
 
-require github.com/opencloud-eu/opencloud v1.1.1-0.20260803184251-d695d283f66c
+require (
+	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260310090739-853d972b282d
+	github.com/opencloud-eu/opencloud v1.1.1-0.20260803184251-d695d283f66c
+)
 
 require (
 	dario.cat/mergo v1.0.2 // indirect
@@ -45,7 +48,6 @@ require (
 	github.com/miekg/dns v1.1.68 // indirect
 	github.com/mileusna/useragent v1.3.5 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260310090739-853d972b282d // indirect
 	github.com/opencloud-eu/reva/v2 v2.48.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
