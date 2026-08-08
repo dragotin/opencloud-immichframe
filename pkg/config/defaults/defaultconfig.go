@@ -32,7 +32,7 @@ func DefaultConfig() *config.Config {
 		HTTP: config.HTTP{
 			Addr: ":8080",
 		},
-		Frame: config.Frame{
+		ImmichFrame: config.ImmichFrame{
 			CatalogRefresh: 5 * time.Minute,
 		},
 		Client: config.ClientSettings{
@@ -61,5 +61,5 @@ func EnsureDefaults(_ *config.Config) {}
 // Sanitize normalises the config (trims trailing slashes on URLs and paths).
 func Sanitize(cfg *config.Config) {
 	cfg.OpenCloud.URL = strings.TrimRight(cfg.OpenCloud.URL, "/")
-	cfg.Frame.WebRoot = strings.TrimRight(cfg.Frame.WebRoot, "/")
+	cfg.ImmichFrame.WebRoot = strings.TrimRight(cfg.ImmichFrame.WebRoot, "/")
 }

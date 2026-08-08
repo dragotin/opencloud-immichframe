@@ -46,10 +46,10 @@ func Validate(cfg *config.Config) error {
 		return errors.New("immichframe: OC_URL (or IMMICHFRAME_OPENCLOUD_URL) is required")
 	}
 	if cfg.OpenCloud.SpaceID == "" && cfg.OpenCloud.SpaceName == "" {
-		return errors.New("immichframe: either IMMICHFRAME_SPACE_ID or IMMICHFRAME_SPACE_NAME is required")
+		return errors.New("immichframe: either IMMICHFRAME_OPENCLOUD_SPACE_ID or IMMICHFRAME_OPENCLOUD_SPACE_NAME is required")
 	}
 	if cfg.OpenCloud.BearerToken == "" && (cfg.OpenCloud.Username == "" || cfg.OpenCloud.AppPassword == "") {
-		return fmt.Errorf("immichframe: provide IMMICHFRAME_BEARER_TOKEN, or IMMICHFRAME_USERNAME + IMMICHFRAME_APP_PASSWORD")
+		return fmt.Errorf("immichframe: provide IMMICHFRAME_OPENCLOUD_BEARER_TOKEN, or IMMICHFRAME_OPENCLOUD_USERNAME + IMMICHFRAME_OPENCLOUD_APP_PASSWORD")
 	}
 	return nil
 }

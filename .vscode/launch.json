@@ -13,9 +13,9 @@
             "program": "cmd/immichframe-opencloud",
             "env": {
                 "OC_URL": "https://localhost:9200/",
-                "IMMICHFRAME_SPACE_ID": "8a7b0bcd-3d6b-42b4-8423-430c715ccfc4$df34622e-637e-4c4f-b74b-0305212b351f",
-                "IMMICHFRAME_USERNAME": "dennis",
-                "IMMICHFRAME_APP_PASSWORD": "deftly grunge irregular outlying retying reprint",
+                "IMMICHFRAME_OPENCLOUD_SPACE_ID": "8a7b0bcd-3d6b-42b4-8423-430c715ccfc4$df34622e-637e-4c4f-b74b-0305212b351f",
+                "IMMICHFRAME_OPENCLOUD_USERNAME": "dennis",
+                "IMMICHFRAME_OPENCLOUD_APP_PASSWORD": "deftly grunge irregular outlying retying reprint",
                 "OC_INSECURE": "true",
                 "IMMICHFRAME_AUTH_SECRET": "mysecret"
             }

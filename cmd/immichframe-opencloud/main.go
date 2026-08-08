@@ -73,10 +73,10 @@ func run() error {
 	}
 	log.Printf("connected to OpenCloud %s, serving space %s", cfg.OpenCloud.URL, client.SpaceID())
 
-	catalog := frame.NewCatalog(initCtx, client, cfg.Frame.CatalogRefresh)
+	catalog := frame.NewCatalog(initCtx, client, cfg.ImmichFrame.CatalogRefresh)
 	go catalog.Run(ctx)
 
-	srv := frame.NewServer(cfg.Client, cfg.Frame.AuthSecret, version, cfg.Frame.WebRoot, catalog, client)
+	srv := frame.NewServer(cfg.Client, cfg.ImmichFrame.AuthSecret, version, cfg.ImmichFrame.WebRoot, catalog, client)
 
 	httpServer := &http.Server{
 		Addr:              cfg.HTTP.Addr,
@@ -91,10 +91,10 @@ func run() error {
 		_ = httpServer.Shutdown(shutdownCtx)
 	}()
 
-	if cfg.Frame.WebRoot != "" {
-		log.Printf("serving web UI from %s", cfg.Frame.WebRoot)
+	if cfg.ImmichFrame.WebRoot != "" {
+		log.Printf("serving web UI from %s", cfg.ImmichFrame.WebRoot)
 	}
-	log.Printf("listening on %s (auth: %v)", cfg.HTTP.Addr, cfg.Frame.AuthSecret != "")
+	log.Printf("listening on %s (auth: %v)", cfg.HTTP.Addr, cfg.ImmichFrame.AuthSecret != "")
 	if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
