@@ -55,11 +55,11 @@ All configuration is via environment variables.
 | Variable | Required | Default | Notes |
 | --- | --- | --- | --- |
 | `OC_URL` | yes | – | e.g. `https://cloud.example.com` |
-| `IMMICHFRAME_SPACE_ID` | one of id/name | – | Drive (space) id to serve. |
-| `IMMICHFRAME_SPACE_NAME` | one of id/name | – | Resolved via `/graph/v1.0/me/drives`. |
-| `IMMICHFRAME_USERNAME` | with app pw | – | For Basic auth (app token). |
-| `IMMICHFRAME_APP_PASSWORD` | with username | – | An OpenCloud app password/token. |
-| `IMMICHFRAME_BEARER_TOKEN` | alt to basic | – | Static bearer token; takes precedence. |
+| `IMMICHFRAME_OPENCLOUD_SPACE_ID` | one of id/name | – | Drive (space) id to serve. |
+| `IMMICHFRAME_OPENCLOUD_SPACE_NAME` | one of id/name | – | Resolved via `/graph/v1.0/me/drives`. |
+| `IMMICHFRAME_OPENCLOUD_USERNAME` | with app pw | – | For Basic auth (app token). |
+| `IMMICHFRAME_OPENCLOUD_APP_PASSWORD` | with username | – | An OpenCloud app password/token. |
+| `IMMICHFRAME_OPENCLOUD_BEARER_TOKEN` | alt to basic | – | Static bearer token; takes precedence. |
 | `OC_INSECURE` | no | `false` | Accept self-signed / invalid TLS certs (dev only). Also settable via the `-insecure` flag. |
 
 ### Frame API
@@ -125,9 +125,9 @@ container by the `environment:` block in `docker-compose.yml`; see
 
 ```sh
 export OC_URL=https://cloud.example.com
-export IMMICHFRAME_SPACE_NAME="Photo Frame"
-export IMMICHFRAME_USERNAME=frame
-export IMMICHFRAME_APP_PASSWORD=xxxxxxxx
+export IMMICHFRAME_OPENCLOUD_SPACE_NAME="Photo Frame"
+export IMMICHFRAME_OPENCLOUD_USERNAME=frame
+export IMMICHFRAME_OPENCLOUD_APP_PASSWORD=xxxxxxxx
 export IMMICHFRAME_AUTH_SECRET=my-shared-secret
 
 go run ./cmd/immichframe-opencloud
@@ -149,9 +149,9 @@ go run ./cmd/immichframe-opencloud -insecure
 docker build -t immichframe-opencloud .
 docker run --rm -p 8080:8080 \
   -e OC_URL=https://cloud.example.com \
-  -e IMMICHFRAME_SPACE_NAME="Photo Frame" \
-  -e IMMICHFRAME_USERNAME=frame \
-  -e IMMICHFRAME_APP_PASSWORD=xxxxxxxx \
+  -e IMMICHFRAME_OPENCLOUD_SPACE_NAME="Photo Frame" \
+  -e IMMICHFRAME_OPENCLOUD_USERNAME=frame \
+  -e IMMICHFRAME_OPENCLOUD_APP_PASSWORD=xxxxxxxx \
   -e IMMICHFRAME_AUTH_SECRET=my-shared-secret \
   immichframe-opencloud
 ```
@@ -177,7 +177,7 @@ docker compose up -d --build
 ```
 
 Notes:
-- Set `IMMICHFRAME_SPACE_NAME` (e.g. `Images`) rather than `IMMICHFRAME_SPACE_ID` —
+- Set `IMMICHFRAME_OPENCLOUD_SPACE_NAME` (e.g. `Images`) rather than `IMMICHFRAME_OPENCLOUD_SPACE_ID` —
   space ids contain `$`, which Compose interpolates (double it as `$$` if you
   must use the id).
 - If OpenCloud runs on the Docker host, keep
