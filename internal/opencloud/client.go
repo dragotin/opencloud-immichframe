@@ -17,6 +17,8 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 )
 
 // imageExtensions is the fallback set used when a driveItem carries no mime
@@ -79,12 +81,12 @@ func New(ctx context.Context, o Options) (*Client, error) {
 		if err != nil {
 			return nil, err
 		}
-		c.spaceID = d.ID
-		c.space = SpaceInfo{ID: d.ID, Name: d.Name, Description: d.Description}
+		c.spaceID = d.GetId()
+		c.space = SpaceInfo{ID: d.GetId(), Name: d.GetName(), Description: d.GetDescription()}
 	} else {
 		// Best-effort: fetch the drive so we know its name/description too.
 		if d, err := c.fetchDrive(ctx, c.spaceID); err == nil {
-			c.space = SpaceInfo{ID: d.ID, Name: d.Name, Description: d.Description}
+			c.space = SpaceInfo{ID: d.GetId(), Name: d.GetName(), Description: d.GetDescription()}
 		} else {
 			c.space = SpaceInfo{ID: c.spaceID}
 		}
@@ -98,25 +100,25 @@ func (c *Client) SpaceID() string { return c.spaceID }
 // Space returns the resolved space metadata (id, name, description).
 func (c *Client) Space() SpaceInfo { return c.space }
 
-func (c *Client) resolveSpaceByName(ctx context.Context, name string) (graphDrive, error) {
+func (c *Client) resolveSpaceByName(ctx context.Context, name string) (libregraph.Drive, error) {
 	u := c.baseURL + "/graph/v1.0/me/drives"
-	var resp graphDrivesResponse
+	var resp driveList
 	if err := c.getJSON(ctx, u, &resp); err != nil {
-		return graphDrive{}, fmt.Errorf("list drives: %w", err)
+		return libregraph.Drive{}, fmt.Errorf("list drives: %w", err)
 	}
 	for _, d := range resp.Value {
-		if strings.EqualFold(d.Name, name) {
+		if strings.EqualFold(d.GetName(), name) {
 			return d, nil
 		}
 	}
-	return graphDrive{}, fmt.Errorf("no space named %q found", name)
+	return libregraph.Drive{}, fmt.Errorf("no space named %q found", name)
 }
 
-func (c *Client) fetchDrive(ctx context.Context, id string) (graphDrive, error) {
+func (c *Client) fetchDrive(ctx context.Context, id string) (libregraph.Drive, error) {
 	u := fmt.Sprintf("%s/graph/v1.0/drives/%s", c.baseURL, url.PathEscape(id))
-	var d graphDrive
+	var d libregraph.Drive
 	if err := c.getJSON(ctx, u, &d); err != nil {
-		return graphDrive{}, err
+		return libregraph.Drive{}, err
 	}
 	return d, nil
 }
@@ -139,39 +141,40 @@ func (c *Client) ListImages(ctx context.Context) ([]DriveItem, error) {
 func (c *Client) walk(ctx context.Context, itemID, prefix string, album *Album, out *[]DriveItem) error {
 	u := fmt.Sprintf("%s/graph/v1.0/drives/%s/items/%s/children", c.baseURL, url.PathEscape(c.spaceID), url.PathEscape(itemID))
 
-	var resp graphChildrenResponse
+	var resp driveItemList
 	if err := c.getJSON(ctx, u, &resp); err != nil {
 		return fmt.Errorf("list children of %q: %w", prefix, err)
 	}
 
 	for _, it := range resp.Value {
-		itemPath := prefix + it.Name
+		name := it.GetName()
+		itemPath := prefix + name
 		switch {
-		case it.Folder != nil:
+		case it.HasFolder():
 			// Skip hidden/dot folders (e.g. OpenCloud's internal ".space").
-			if strings.HasPrefix(it.Name, ".") {
+			if strings.HasPrefix(name, ".") {
 				continue
 			}
-			childAlbum := &Album{ID: it.ID, Name: it.Name, Path: itemPath}
-			if err := c.walk(ctx, it.ID, itemPath+"/", childAlbum, out); err != nil {
+			childAlbum := &Album{ID: it.GetId(), Name: name, Path: itemPath}
+			if err := c.walk(ctx, it.GetId(), itemPath+"/", childAlbum, out); err != nil {
 				return err
 			}
-		case it.File != nil || isImageName(it.Name):
+		case it.HasFile() || isImageName(name):
 			mime := ""
-			if it.File != nil {
-				mime = it.File.MimeType
+			if it.HasFile() {
+				mime = it.File.GetMimeType()
 			}
-			if !isImage(mime, it.Name) {
+			if !isImage(mime, name) {
 				continue
 			}
 			*out = append(*out, DriveItem{
-				ID:           it.ID,
-				Name:         it.Name,
+				ID:           it.GetId(),
+				Name:         name,
 				Path:         itemPath,
-				Size:         it.Size,
+				Size:         it.GetSize(),
 				MimeType:     mime,
-				ETag:         strings.Trim(it.ETag, `"`),
-				LastModified: it.LastModifiedDateTime,
+				ETag:         strings.Trim(it.GetETag(), `"`),
+				LastModified: it.GetLastModifiedDateTime(),
 				Album:        album,
 			})
 		}

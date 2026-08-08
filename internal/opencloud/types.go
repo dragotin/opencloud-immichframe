@@ -7,6 +7,8 @@ package opencloud
 import (
 	"io"
 	"time"
+
+	libregraph "github.com/opencloud-eu/libre-graph-api-go"
 )
 
 // DriveItem is the flattened representation of a LibreGraph driveItem that we
@@ -42,44 +44,20 @@ type DownloadResult struct {
 	Body          io.ReadCloser
 }
 
-// graphChildrenResponse is the envelope returned by the LibreGraph children
-// endpoints.
-type graphChildrenResponse struct {
-	Value []graphDriveItem `json:"value"`
-}
-
-type graphDriveItem struct {
-	ID                   string          `json:"id"`
-	Name                 string          `json:"name"`
-	Size                 int64           `json:"size"`
-	ETag                 string          `json:"eTag"`
-	LastModifiedDateTime time.Time       `json:"lastModifiedDateTime"`
-	File                 *graphFileFacet `json:"file,omitempty"`
-	Folder               *graphFolder    `json:"folder,omitempty"`
-}
-
-type graphFileFacet struct {
-	MimeType string `json:"mimeType"`
-}
-
-type graphFolder struct {
-	ChildCount int64 `json:"childCount"`
-}
-
-// graphDrivesResponse is returned by /graph/v1.0/me/drives.
-type graphDrivesResponse struct {
-	Value []graphDrive `json:"value"`
-}
-
-type graphDrive struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
-
 // SpaceInfo is the resolved metadata of the served space.
 type SpaceInfo struct {
 	ID          string
 	Name        string
 	Description string
+}
+
+// driveList and driveItemList decode the LibreGraph collection envelopes
+// ({"value": [...]}) returned by the drives and children endpoints into the
+// generated libregraph types.
+type driveList struct {
+	Value []libregraph.Drive `json:"value"`
+}
+
+type driveItemList struct {
+	Value []libregraph.DriveItem `json:"value"`
 }

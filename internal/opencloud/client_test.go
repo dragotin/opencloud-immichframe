@@ -28,22 +28,24 @@ func mockServer(t *testing.T) *httptest.Server {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /graph/v1.0/drives/"+testSpace+"/items/"+testSpace+"/children", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(w, graphChildrenResponse{Value: []graphDriveItem{
-			{ID: "id-a", Name: "a.jpg", Size: 100, ETag: `"etag-a"`, LastModifiedDateTime: time.Unix(1700000000, 0).UTC(), File: &graphFileFacet{MimeType: "image/jpeg"}},
-			{ID: "id-notes", Name: "notes.txt", Size: 5, File: &graphFileFacet{MimeType: "text/plain"}},
-			{ID: "id-sub", Name: "sub", Folder: &graphFolder{ChildCount: 1}},
-			{ID: "id-dot", Name: ".space", Folder: &graphFolder{ChildCount: 1}},
+		writeJSON(w, map[string]any{"value": []map[string]any{
+			{"id": "id-a", "name": "a.jpg", "size": 100, "eTag": `"etag-a"`,
+				"lastModifiedDateTime": time.Unix(1700000000, 0).UTC().Format(time.RFC3339),
+				"file":                 map[string]any{"mimeType": "image/jpeg"}},
+			{"id": "id-notes", "name": "notes.txt", "size": 5, "file": map[string]any{"mimeType": "text/plain"}},
+			{"id": "id-sub", "name": "sub", "folder": map[string]any{"childCount": 1}},
+			{"id": "id-dot", "name": ".space", "folder": map[string]any{"childCount": 1}},
 		}})
 	})
 	mux.HandleFunc("GET /graph/v1.0/drives/"+testSpace+"/items/id-sub/children", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(w, graphChildrenResponse{Value: []graphDriveItem{
-			{ID: "id-b", Name: "b.png", Size: 50, ETag: `"etag-b"`, File: &graphFileFacet{MimeType: "image/png"}},
+		writeJSON(w, map[string]any{"value": []map[string]any{
+			{"id": "id-b", "name": "b.png", "size": 50, "eTag": `"etag-b"`, "file": map[string]any{"mimeType": "image/png"}},
 		}})
 	})
 	// A hidden dot-folder whose image must be excluded from the walk.
 	mux.HandleFunc("GET /graph/v1.0/drives/"+testSpace+"/items/id-dot/children", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(w, graphChildrenResponse{Value: []graphDriveItem{
-			{ID: "id-hidden", Name: "cover.jpg", Size: 10, File: &graphFileFacet{MimeType: "image/jpeg"}},
+		writeJSON(w, map[string]any{"value": []map[string]any{
+			{"id": "id-hidden", "name": "cover.jpg", "size": 10, "file": map[string]any{"mimeType": "image/jpeg"}},
 		}})
 	})
 	mux.HandleFunc("GET /dav/spaces/"+testSpace+"/", func(w http.ResponseWriter, r *http.Request) {
