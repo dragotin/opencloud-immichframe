@@ -1,0 +1,11 @@
+# Consumed by dschmidt/opencloud-service-docs-action.
+service:
+  name: immichframe
+
+site:
+  title: immichframe-opencloud
+  tagline: ImmichFrame API backed by an OpenCloud space
+
+pins:
+  generator_ref: 80a5711c890de7720f53e585a32cb8be47b27709
+  theme_ref: 0909f2d83e91f107a770ae5da3b8d3127279c26c
