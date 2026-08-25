@@ -1,4 +1,4 @@
-module github.com/immichFrame/immichframe-opencloud
+module github.com/immichFrame/opencloud-immichframe
 
 go 1.25.8
 

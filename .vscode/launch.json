@@ -10,7 +10,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "cmd/immichframe-opencloud",
+            "program": "cmd/opencloud-immichframe",
             "env": {
                 "OC_URL": "https://localhost:9200/",
                 "IMMICHFRAME_OPENCLOUD_SPACE_ID": "8a7b0bcd-3d6b-42b4-8423-430c715ccfc4$df34622e-637e-4c4f-b74b-0305212b351f",
