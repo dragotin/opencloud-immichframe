@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/immichFrame/immichframe-opencloud/pkg/config"
+	"github.com/immichFrame/opencloud-immichframe/pkg/config"
 )
 
 // FullDefaultConfig returns the fully defaulted config.

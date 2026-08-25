@@ -13,8 +13,8 @@ import (
 	occfg "github.com/opencloud-eu/opencloud/pkg/config"
 	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 
-	"github.com/immichFrame/immichframe-opencloud/pkg/config"
-	"github.com/immichFrame/immichframe-opencloud/pkg/config/defaults"
+	"github.com/immichFrame/opencloud-immichframe/pkg/config"
+	"github.com/immichFrame/opencloud-immichframe/pkg/config/defaults"
 )
 
 // ParseConfig applies the config sources to cfg and validates it.
