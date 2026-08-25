@@ -1,4 +1,4 @@
-# immichframe-opencloud
+# opencloud-immichframe
 
 An [ImmichFrame](https://github.com/immichFrame/ImmichFrame)-compatible HTTP API
 backend written in Go, serving photos from an **OpenCloud space** instead of an
@@ -81,7 +81,7 @@ serve the whole ImmichFrame web app at `/` *and* the API at `/api`. Point
 cd ImmichFrame/immichFrame.Web && npm install && npm run build   # produces build/
 # then start this service with:
 IMMICHFRAME_WEB_ROOT=/path/to/ImmichFrame/immichFrame.Web/build ...other env... \
-  immichframe-opencloud
+  opencloud-immichframe
 ```
 
 Now `http://localhost:8080/` serves the UI and `http://localhost:8080/api/*` the
@@ -130,7 +130,7 @@ export IMMICHFRAME_OPENCLOUD_USERNAME=frame
 export IMMICHFRAME_OPENCLOUD_APP_PASSWORD=xxxxxxxx
 export IMMICHFRAME_AUTH_SECRET=my-shared-secret
 
-go run ./cmd/immichframe-opencloud
+go run ./cmd/opencloud-immichframe
 ```
 
 ### Command-line flags
@@ -140,18 +140,18 @@ go run ./cmd/immichframe-opencloud
 | `-insecure` | Accept self-signed / invalid TLS certificates from the OpenCloud server. Overrides `OC_INSECURE`. Development only. |
 
 ```sh
-go run ./cmd/immichframe-opencloud -insecure
+go run ./cmd/opencloud-immichframe -insecure
 ```
 
 ### Docker
 
 ```sh
-docker build -t immichframe-opencloud .
+docker build -t opencloud-immichframe .
 docker run --rm -p 8080:8080 \
   -e OC_URL=https://cloud.example.com \
-  -e IMMICHFRAME_OPENCLOUD_SPACE_NAME="Photo Frame" \
-  -e IMMICHFRAME_OPENCLOUD_USERNAME=frame \
-  -e IMMICHFRAME_OPENCLOUD_APP_PASSWORD=xxxxxxxx \
+  -e OPENCLOUD_IMMICHFRAME="Photo Frame" \
+  -e OPENCLOUD_IMMICHFRAME=frame \
+  -e OPENCLOUD_IMMICHFRAME_APP_PASSWORD=xxxxxxxx \
   -e IMMICHFRAME_AUTH_SECRET=my-shared-secret \
   immichframe-opencloud
 ```
@@ -163,7 +163,7 @@ displays photos from your OpenCloud space:
 
 ```
 client ─▶ traefik :8080
-           ├─ PathPrefix(`/api`) ─▶ immichframe-opencloud   (OpenCloud photos)
+           ├─ PathPrefix(`/api`) ─▶ opencloud-immichframe   (OpenCloud photos)
            └─ PathPrefix(`/`)    ─▶ immichframe (official)   (ImmichFrame web UI)
 ```
 

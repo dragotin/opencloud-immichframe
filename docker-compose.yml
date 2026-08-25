@@ -1,13 +1,13 @@
 
-name: immichframe-opencloud
+name: opencloud-immichframe
 
 # Topology
-#   client ─▶ traefik :8080 ─▶ immichframe-opencloud  (web UI + API, one origin)
+#   client ─▶ traefik :8080 ─▶ opencloud-immichframe  (web UI + API, one origin)
 #
 # The official ImmichFrame server refuses to boot without a reachable Immich, so
 # it cannot run as a headless web-UI container. Instead the official image is
 # used as an init container that exports its bundled web UI into a shared
-# volume, which immichframe-opencloud then serves via IMMICHFRAME_WEB_ROOT. Traefik is the
+# volume, which opencloud-immichframe then serves via IMMICHFRAME_WEB_ROOT. Traefik is the
 # edge proxy (single entrypoint; add TLS/dashboard here later).
 
 volumes:
@@ -24,10 +24,10 @@ services:
     restart: "no"
 
   # Our Go backend — serves the API from an OpenCloud space AND the web UI from the volume.
-  immichframe-opencloud:
+  opencloud-immichframe:
     build:
       context: .
-    image: immichframe-opencloud:local
+    image: opencloud-immichframe:local
     restart: unless-stopped
     depends_on:
       webui:
@@ -53,7 +53,7 @@ services:
     image: traefik:v3.3
     restart: unless-stopped
     depends_on:
-      - immichframe-opencloud
+      - opencloud-immichframe
     command:
       - --entryPoints.web.address=:8080
       - --providers.file.filename=/etc/traefik/dynamic.yml

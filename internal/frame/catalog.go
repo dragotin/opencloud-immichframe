@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/immichFrame/immichframe-opencloud/internal/opencloud"
+	"github.com/immichFrame/opencloud-immichframe/internal/opencloud"
 )
 
 // namespace is a fixed UUID used to derive stable UUIDv5 asset ids from opaque

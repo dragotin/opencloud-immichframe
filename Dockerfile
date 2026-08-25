@@ -7,10 +7,10 @@ RUN go mod download
 COPY . .
 ARG VERSION=dev
 RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" \
-    -o /out/immichframe-opencloud ./cmd/immichframe-opencloud
+    -o /out/opencloud-immichframe ./cmd/opencloud-immichframe
 
 FROM gcr.io/distroless/static-debian12:nonroot
-COPY --from=build /out/immichframe-opencloud /usr/local/bin/immichframe-opencloud
+COPY --from=build /out/opencloud-immichframe /usr/local/bin/opencloud-immichframe
 EXPOSE 8080
 USER nonroot:nonroot
-ENTRYPOINT ["/usr/local/bin/immichframe-opencloud"]
+ENTRYPOINT ["/usr/local/bin/opencloud-immichframe"]

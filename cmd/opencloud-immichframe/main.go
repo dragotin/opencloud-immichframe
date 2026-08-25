@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// Command immichframe-opencloud serves the ImmichFrame HTTP API from an
+// Command opencloud-immichframe serves the ImmichFrame HTTP API from an
 // OpenCloud space.
 //
 // This project is developed by Klaas Freitag with the assistance of Claude
@@ -19,11 +19,10 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/immichFrame/immichframe-opencloud/internal/frame"
-	"github.com/immichFrame/immichframe-opencloud/internal/opencloud"
-	"github.com/immichFrame/immichframe-opencloud/pkg/config/defaults"
-	"github.com/immichFrame/immichframe-opencloud/pkg/config/parser"
+	"github.com/immichFrame/opencloud-immichframe/internal/frame"
+	"github.com/immichFrame/opencloud-immichframe/internal/opencloud"
+        "github.com/immichFrame/opencloud-immichframe/pkg/config/defaults"
+        "github.com/immichFrame/opencloud-immichframe/pkg/config/parser"
 )
 
 // version is overridable at build time: -ldflags "-X main.version=1.2.3".
