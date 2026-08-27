@@ -4,7 +4,7 @@ build:
 	go build ./...
 
 run:
-	go run ./cmd/immichframe-opencloud
+	go run ./cmd/opencloud-immichframe
 
 test:
 	go test ./...
