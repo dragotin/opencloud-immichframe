@@ -4,9 +4,9 @@ slug: /
 title: Overview
 ---
 
-# immichframe-opencloud service reference
+# opencloud-immichframe service reference
 
-immichframe-opencloud serves the [ImmichFrame](https://github.com/immichFrame/ImmichFrame)
+opencloud-immichframe serves the [ImmichFrame](https://github.com/immichFrame/ImmichFrame)
 HTTP API from an [OpenCloud](https://opencloud.eu) space instead of an Immich
 server. It reads photos from the space over the LibreGraph (listing) and WebDAV
 (content) APIs, so the ImmichFrame web UI and clients work unchanged.

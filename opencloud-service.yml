@@ -3,7 +3,7 @@ service:
   name: immichframe
 
 site:
-  title: immichframe-opencloud
+  title: opencloud-immichframe
   tagline: ImmichFrame API backed by an OpenCloud space
 
 pins:

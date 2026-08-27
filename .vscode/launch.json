@@ -13,11 +13,11 @@
             "program": "cmd/opencloud-immichframe",
             "env": {
                 "OC_URL": "https://localhost:9200/",
-                "IMMICHFRAME_OPENCLOUD_SPACE_ID": "8a7b0bcd-3d6b-42b4-8423-430c715ccfc4$df34622e-637e-4c4f-b74b-0305212b351f",
-                "IMMICHFRAME_OPENCLOUD_USERNAME": "dennis",
-                "IMMICHFRAME_OPENCLOUD_APP_PASSWORD": "deftly grunge irregular outlying retying reprint",
+                "OPENCLOUD_IMMICHFRAME_SPACE_ID": "<space-id>",
+                "OPENCLOUD_IMMICHFRAME_USERNAME": "dennis",
+                "OPENCLOUD_IMMICHFRAME_APP_PASSWORD": "<app password>",
                 "OC_INSECURE": "true",
-                "IMMICHFRAME_AUTH_SECRET": "mysecret"
+                "OPENCLOUD_IMMICHFRAME_WEB_ROOT": "${workspaceFolder}/../ImmichFrame/immichFrame.Web/build"
             }
         }
     ]

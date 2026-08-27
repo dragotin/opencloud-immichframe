@@ -9,6 +9,7 @@
 package defaults
 
 import (
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -58,8 +59,19 @@ func DefaultConfig() *config.Config {
 // values. Currently a no-op.
 func EnsureDefaults(_ *config.Config) {}
 
-// Sanitize normalises the config (trims trailing slashes on URLs and paths).
+// Sanitize normalises the config (trims trailing slashes on URLs, resolves the
+// web root to an absolute path). WebRoot must come out absolute and cleaned:
+// the static handler compares joined request paths against it with a prefix
+// check, which a relative path or an unresolved ".." segment would defeat.
 func Sanitize(cfg *config.Config) {
 	cfg.OpenCloud.URL = strings.TrimRight(cfg.OpenCloud.URL, "/")
-	cfg.ImmichFrame.WebRoot = strings.TrimRight(cfg.ImmichFrame.WebRoot, "/")
+
+	if cfg.ImmichFrame.WebRoot != "" {
+		// filepath.Abs cleans as it resolves; keep the original on failure so
+		// the operator sees the path they configured in the error.
+		if abs, err := filepath.Abs(cfg.ImmichFrame.WebRoot); err == nil {
+			cfg.ImmichFrame.WebRoot = abs
+		}
+		cfg.ImmichFrame.WebRoot = strings.TrimRight(cfg.ImmichFrame.WebRoot, "/")
+	}
 }

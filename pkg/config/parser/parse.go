@@ -44,13 +44,13 @@ func ParseConfig(cfg *config.Config) error {
 // Validate checks mandatory fields.
 func Validate(cfg *config.Config) error {
 	if cfg.OpenCloud.URL == "" {
-		return errors.New("immichframe: OC_URL (or IMMICHFRAME_OPENCLOUD_URL) is required")
+		return errors.New("immichframe: OC_URL (or OPENCLOUD_IMMICHFRAME_URL) is required")
 	}
 	if cfg.OpenCloud.SpaceID == "" && cfg.OpenCloud.SpaceName == "" {
-		return errors.New("immichframe: either IMMICHFRAME_OPENCLOUD_SPACE_ID or IMMICHFRAME_OPENCLOUD_SPACE_NAME is required")
+		return errors.New("immichframe: either OPENCLOUD_IMMICHFRAME_SPACE_ID or OPENCLOUD_IMMICHFRAME_SPACE_NAME is required")
 	}
 	if cfg.OpenCloud.BearerToken == "" && (cfg.OpenCloud.Username == "" || cfg.OpenCloud.AppPassword == "") {
-		return fmt.Errorf("immichframe: provide IMMICHFRAME_OPENCLOUD_BEARER_TOKEN, or IMMICHFRAME_OPENCLOUD_USERNAME + IMMICHFRAME_OPENCLOUD_APP_PASSWORD")
+		return fmt.Errorf("immichframe: provide OPENCLOUD_IMMICHFRAME_BEARER_TOKEN, or OPENCLOUD_IMMICHFRAME_USERNAME + OPENCLOUD_IMMICHFRAME_APP_PASSWORD")
 	}
 	return nil
 }
