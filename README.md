@@ -153,7 +153,7 @@ docker run --rm -p 8080:8080 \
   -e OPENCLOUD_IMMICHFRAME=frame \
   -e OPENCLOUD_IMMICHFRAME_APP_PASSWORD=xxxxxxxx \
   -e IMMICHFRAME_AUTH_SECRET=my-shared-secret \
-  immichframe-opencloud
+  opencloud-immichframe
 ```
 
 ## Docker Compose (official web UI + OpenCloud API via Traefik)
