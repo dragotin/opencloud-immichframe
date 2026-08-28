@@ -3,7 +3,7 @@ module github.com/immichFrame/opencloud-immichframe
 go 1.25.8
 
 require (
-	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260310090739-853d972b282d
+	github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260818063016-69f82a7dde55
 	github.com/opencloud-eu/opencloud v1.1.1-0.20260803184251-d695d283f66c
 )
 

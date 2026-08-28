@@ -390,8 +390,8 @@ github.com/onsi/ginkgo/v2 v2.32.0/go.mod h1:+aXOY+vzZ5mu2iI2HpTZUPmM//oQfsNFX6gU
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
 github.com/onsi/gomega v1.42.1 h1:iN1rCUX+44NZ1Dc97MPoeFYbFR0vh8zxoxMFwKdyZ6I=
 github.com/onsi/gomega v1.42.1/go.mod h1:REff/hsDsodHoKlWsP2mAPhu1+5/6hVYNf9rIEBpeSg=
-github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260310090739-853d972b282d h1:JcqGDiyrcaQwVyV861TUyQgO7uEmsjkhfm7aQd84dOw=
-github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260310090739-853d972b282d/go.mod h1:pzatilMEHZFT3qV7C/X3MqOa3NlRQuYhlRhZTL+hN6Q=
+github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260818063016-69f82a7dde55 h1:dzYZ5iA6i0QoFUap9l6sZ4Ts2HXiXVfsOoiRYToYgm8=
+github.com/opencloud-eu/libre-graph-api-go v1.0.8-0.20260818063016-69f82a7dde55/go.mod h1:lTM8JeGblNpoMySTW7Lui2+c5TTLI95mwxtdUIHHrhU=
 github.com/opencloud-eu/opencloud v1.1.1-0.20260803184251-d695d283f66c h1:wOQdn7PaxEGiw6R9HI/njfj1IiTbgQ9FbQmVFRk0W8s=
 github.com/opencloud-eu/opencloud v1.1.1-0.20260803184251-d695d283f66c/go.mod h1:42V6ulJsgiRgm23nvk3lzUz6hNZt+u7stBD3Ddowjh4=
 github.com/opencloud-eu/reva/v2 v2.48.0 h1:G/4Jbv0DWWOfA5u5DtV0CB75pi9Wwtj7JkJQOEBvErs=

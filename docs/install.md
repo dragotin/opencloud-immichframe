@@ -39,26 +39,43 @@ go run ./cmd/opencloud-immichframe -insecure
 docker build -t opencloud-immichframe .
 docker run --rm -p 8080:8080 \
   -e OC_URL=https://cloud.example.com \
-  -e OPENCLOUD_IMMICHFRAME="Photo Frame" \
-  -e OPENCLOUD_IMMICHFRAME=frame \
-  -e OPENCLOUD_IMMICHFRAME_APP_PASSWORD=xxxxxxxx \
+  -e IMMICHFRAME_OPENCLOUD_SPACE_NAME="Photo Frame" \
+  -e IMMICHFRAME_OPENCLOUD_USERNAME=frame \
+  -e IMMICHFRAME_OPENCLOUD_APP_PASSWORD=xxxxxxxx \
   -e IMMICHFRAME_AUTH_SECRET=my-shared-secret \
   opencloud-immichframe
 ```
 
-## Docker Compose (official web UI + OpenCloud API via Traefik)
+This serves the **API only** — the image ships no web UI. The desktop and web
+clients need the UI and the API on one origin, so either mount a built
+ImmichFrame web UI and point `IMMICHFRAME_WEB_ROOT` at it, or use Docker Compose
+below, which wires that up for you.
 
-`docker-compose.yml` runs three services so the **official** ImmichFrame web UI
-displays photos from your OpenCloud space:
+## Docker Compose (official web UI + OpenCloud photos)
+
+`docker-compose.yml` brings up the **official** ImmichFrame web UI showing photos
+from your OpenCloud space, served on a single origin:
 
 ```
-client ─▶ traefik :8080
-           ├─ PathPrefix(`/api`) ─▶ opencloud-immichframe   (OpenCloud photos)
-           └─ PathPrefix(`/`)    ─▶ immichframe (official)   (ImmichFrame web UI)
+  webui (init container)  copies /app/wwwroot ─▶ shared volume, then exits
+                                                        │
+                                                        ▼
+  client ─▶ traefik :8080 ─▶ opencloud-immichframe ─▶ OpenCloud space
+                             │
+                             ├─ /       the web UI, from the shared volume
+                             └─ /api/*  the ImmichFrame API
 ```
 
-Traefik routes every `/api/*` request to the Go backend, so the official
-container is used only for its web UI — its own Immich backend is never touched.
+The official ImmichFrame server refuses to boot without a reachable Immich, so it
+cannot run as a headless web-UI container. Instead its image is used **once, as an
+init container**: its entrypoint is overridden to copy the bundled web UI into a
+shared volume and exit. Because the app itself never starts, none of its own
+settings (`ImmichServerUrl`, `ApiKey`, …) need to be configured.
+
+`opencloud-immichframe` then serves that directory at `/` via
+`IMMICHFRAME_WEB_ROOT` and the API at `/api/*` — one origin, which is what the
+desktop and web clients require. Traefik is the single edge entrypoint, so TLS
+can be added there later.
 
 ```sh
 cp .env.example .env      # then edit it
@@ -67,16 +84,19 @@ docker compose up -d --build
 ```
 
 Notes:
-- Set `IMMICHFRAME_OPENCLOUD_SPACE_NAME` (e.g. `Images`) rather than `IMMICHFRAME_OPENCLOUD_SPACE_ID` —
-  space ids contain `$`, which Compose interpolates (double it as `$$` if you
-  must use the id).
+- Set `IMMICHFRAME_OPENCLOUD_SPACE_NAME` (e.g. `Images`) rather than
+  `IMMICHFRAME_OPENCLOUD_SPACE_ID` — space ids contain `$`, which Compose
+  interpolates (double it as `$$` if you must use the id).
 - If OpenCloud runs on the Docker host, keep
   `OC_URL=https://host.docker.internal:9200` (the compose file maps
   `host.docker.internal`). For a self-signed dev cert, `OC_INSECURE=true`.
-- Rootless Docker: point Traefik at your runtime socket (see the comment in the
-  compose file).
-- The official image needs `ImmichServerUrl`/`ApiKey` set just to boot; the
-  placeholders in `.env.example` are enough since its `/api` is bypassed.
+- The web UI is pinned to a released ImmichFrame tag. To move it, set
+  `IMMICHFRAME_WEBUI_TAG` in `.env` to another
+  [release](https://github.com/immichFrame/ImmichFrame/releases).
+- The shared volume is wiped and re-exported on every `docker compose up`, so a
+  tag change can't leave files from the previous release behind.
+- Only `/api/*` honours `IMMICHFRAME_AUTH_SECRET`; the static UI assets are
+  served without auth.
 
 ## Smoke test
 
