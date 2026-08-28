@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-slug: /
+slug: /api
 title: API
 ---
 
