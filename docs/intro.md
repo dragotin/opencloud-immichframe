@@ -7,7 +7,7 @@ title: Overview
 # OpenCloud ImmichFrame
 
 [ImmichFrame](https://github.com/immichFrame/ImmichFrame) is an addition to Immich that displays
-images on digital photo frames. While it is developed specifically for [Immich](immich.app) (which
+images on digital photo frames. While it is developed specifically for [Immich](https://immich.app) (which
 is an awesome tool for photo management that everybody should use) with this addition to OpenCloud,
 the ImmichFrame clients can also display images that are stored in an OpenCloud space. No Immich
 is required.
