@@ -1,0 +1,21 @@
+---
+# Expose opencloud-immichframe on its own subdomain via the bundled Traefik.
+#
+# Requires traefik/opencloud.yml in COMPOSE_FILE as well — the `hsts-header`
+# middleware referenced below is defined there, on the opencloud service.
+#
+# Point IMMICHFRAME_DOMAIN at a DNS name that resolves to this host.
+#
+# No traefik network alias is needed here (unlike traefik/collabora.yml):
+# OpenCloud never calls the frame, only the other way round.
+
+services:
+  immichframe:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.immichframe.entrypoints=https"
+      - "traefik.http.routers.immichframe.rule=Host(`${IMMICHFRAME_DOMAIN:-frame.opencloud.test}`)"
+      - "traefik.http.routers.immichframe.${TRAEFIK_SERVICES_TLS_CONFIG}"
+      - "traefik.http.routers.immichframe.service=immichframe"
+      - "traefik.http.routers.immichframe.middlewares=hsts-header"
+      - "traefik.http.services.immichframe.loadbalancer.server.port=8080"

@@ -1,0 +1,11 @@
+---
+# Expose opencloud-immichframe on localhost for an external reverse proxy
+# (Nginx, Caddy, …) to terminate TLS in front of.
+#
+# Your proxy must forward the whole vhost — both `/` (the web UI) and `/api/*`
+# — to this port. The ImmichFrame clients need one origin serving both.
+
+services:
+  immichframe:
+    ports:
+      - "127.0.0.1:${IMMICHFRAME_PORT:-8080}:8080"

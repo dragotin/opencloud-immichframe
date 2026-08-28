@@ -1,0 +1,80 @@
+---
+# opencloud-immichframe — serve photos from an OpenCloud space to ImmichFrame
+# clients (digital photo frames), with the official ImmichFrame web UI.
+#
+# Enable it by adding this fragment to COMPOSE_FILE in your .env, together with
+# exactly one exposure fragment:
+#
+#   COMPOSE_FILE=docker-compose.yml:immichframe/immichframe.yml:traefik/opencloud.yml:traefik/immichframe.yml
+#
+# Required in .env: IMMICHFRAME_USERNAME, IMMICHFRAME_APP_PASSWORD,
+# IMMICHFRAME_AUTH_SECRET. See deploy/opencloud-compose/README.md.
+
+services:
+  # Init container. The official ImmichFrame image is used only to export its
+  # bundled web UI into a shared volume, then it exits — the ImmichFrame server
+  # refuses to start without a reachable Immich, so it cannot serve as a
+  # headless UI container. Pinned so an upgrade is always deliberate.
+  immichframe-webui:
+    image: ghcr.io/immichframe/immichframe:${IMMICHFRAME_WEBUI_TAG:-v1.0.37.0}
+    user: "0:0" # write into the root-owned named volume
+    # Wipe first: the volume outlives `down`, so on a tag bump a plain copy
+    # would strand files the new release deleted.
+    entrypoint:
+      - sh
+      - -c
+      - 'rm -rf /web/* /web/.[!.]* 2>/dev/null; cp -r /app/wwwroot/. /web/
+         && echo "ImmichFrame web UI exported to /web"'
+    volumes:
+      - immichframe-webui:/web
+    networks:
+      opencloud-net:
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: "no"
+
+  immichframe:
+    # renovate: depName=ghcr.io/dragotin/opencloud-immichframe
+    image: ${IMMICHFRAME_DOCKER_IMAGE:-ghcr.io/dragotin/opencloud-immichframe}:${IMMICHFRAME_DOCKER_TAG:-latest}
+    networks:
+      opencloud-net:
+    depends_on:
+      immichframe-webui:
+        condition: service_completed_successfully
+    environment:
+      # Reach OpenCloud inside the compose network. The base stack runs the
+      # proxy with PROXY_TLS=false, so this is plain HTTP on 9200 and no
+      # certificate trust is involved — leave it alone unless you know better.
+      #
+      # Deliberately NOT OC_URL: that name belongs to the opencloud service in
+      # this stack. opencloud-immichframe reads `OC_URL;IMMICHFRAME_OPENCLOUD_URL`
+      # and the last name set wins, so this always takes precedence.
+      IMMICHFRAME_OPENCLOUD_URL: http://opencloud:9200
+      # Which space to serve. Use the name — space ids contain `$`, which
+      # Compose interpolates.
+      IMMICHFRAME_OPENCLOUD_SPACE_NAME: ${IMMICHFRAME_SPACE_NAME:-Images}
+      # An OpenCloud app token and the user it belongs to. auth-app is started
+      # by default and PROXY_ENABLE_APP_AUTH defaults to true, so nothing needs
+      # enabling on the opencloud service — just create the token in the UI.
+      IMMICHFRAME_OPENCLOUD_USERNAME: ${IMMICHFRAME_USERNAME}
+      IMMICHFRAME_OPENCLOUD_APP_PASSWORD: ${IMMICHFRAME_APP_PASSWORD}
+      # Clients must send `Authorization: Bearer <secret>` to reach /api/*.
+      # Static UI assets are served without auth; the photos are not.
+      IMMICHFRAME_AUTH_SECRET: ${IMMICHFRAME_AUTH_SECRET}
+      # The web UI exported by the init container above, served at /.
+      IMMICHFRAME_WEB_ROOT: /web
+      IMMICHFRAME_CATALOG_REFRESH: ${IMMICHFRAME_CATALOG_REFRESH:-5m}
+      IMMICHFRAME_INTERVAL: ${IMMICHFRAME_INTERVAL:-8}
+      IMMICHFRAME_SHOW_ALBUM_NAME: ${IMMICHFRAME_SHOW_ALBUM_NAME:-true}
+      TZ: ${TZ:-Etc/UTC}
+    volumes:
+      - immichframe-webui:/web:ro
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    # The space is resolved once at startup and the process exits if OpenCloud
+    # is not reachable yet. On a cold start it will restart a few times while
+    # OpenCloud finishes `opencloud init`; that is expected, not a fault.
+    restart: always
+
+volumes:
+  immichframe-webui:
