@@ -10,7 +10,7 @@ import (
 	"errors"
 	"fmt"
 
-	occfg "github.com/opencloud-eu/opencloud/pkg/config"
+	"github.com/opencloud-eu/opencloud/pkg/config/binder"
 	"github.com/opencloud-eu/opencloud/pkg/config/envdecode"
 
 	"github.com/immichFrame/opencloud-immichframe/pkg/config"
@@ -19,11 +19,9 @@ import (
 
 // ParseConfig applies the config sources to cfg and validates it.
 // Precedence: defaults -> yaml file -> env vars. yaml via opencloud's
-// BindSourcesToStructs, env via envdecode. Importing opencloud/pkg/config
-// pulls in its service configs; opencloud-eu/opencloud#3270 moves
-// BindSourcesToStructs to a leaf package to drop those.
+// BindSourcesToStructs, env via envdecode.
 func ParseConfig(cfg *config.Config) error {
-	if err := occfg.BindSourcesToStructs(cfg.Service.Name, cfg); err != nil {
+	if err := binder.BindSourcesToStructs(cfg.Service.Name, cfg); err != nil {
 		return err
 	}
 
